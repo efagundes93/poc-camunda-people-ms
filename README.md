@@ -1,3 +1,4 @@
+<<<<<<< Upstream, based on branch 'master' of https://github.com/efagundes93/poc-camunda-people-ms.git
 # poc-camunda-people-ms
 ## Motivação
 
@@ -64,3 +65,7 @@ A implementação desta interface basicamente consiste em sobrescrever o método
 https://docs.camunda.org/manual/7.11/introduction/
 
 https://stackoverflow.com/questions/55974200/integrate-camunda-webapp-in-spring-reactive-project
+=======
+# poc-camunda-people-ms
+projeto para testes da construção de microsserviço utlizando spring boot 2 e camunda
+>>>>>>> c52816e init

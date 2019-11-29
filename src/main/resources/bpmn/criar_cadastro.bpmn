@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bioc="http://bpmn.io/schema/bpmn/biocolor/1.0" id="Definitions_00ew8zb" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="3.4.1">
+  <bpmn:collaboration id="Collaboration_1uawxtu">
+    <bpmn:participant id="Participant_1t3gnzw" name="Criar cadastro" processRef="criar_cadastro" />
+  </bpmn:collaboration>
+  <bpmn:process id="criar_cadastro" name="criar cadastro" isExecutable="true">
+    <bpmn:startEvent id="StartEvent_1" name="inicio" camunda:asyncBefore="true">
+      <bpmn:outgoing>SequenceFlow_1ym0n9h</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:dataStoreReference id="PeopleDatabase" name="people" />
+    <bpmn:serviceTask id="SavePeople" name="salvar cadastro" camunda:delegateExpression="#{savePeople}">
+      <bpmn:incoming>SequenceFlow_15l0rws</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_0gwzhbg</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_1t24xt7">
+        <bpmn:targetRef>PeopleDatabase</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:endEvent id="EndEvent_0l5wf0k" name="fim" camunda:asyncBefore="true" camunda:asyncAfter="true">
+      <bpmn:incoming>SequenceFlow_0gwzhbg</bpmn:incoming>
+      <bpmn:incoming>SequenceFlow_1n5ya3l</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:serviceTask id="FindByDocument" name="Buscar cadastro por documento" camunda:delegateExpression="#{findPeopleByLegalDocumentNumber}">
+      <bpmn:incoming>SequenceFlow_1ym0n9h</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1ae02k9</bpmn:outgoing>
+      <bpmn:dataOutputAssociation id="DataOutputAssociation_1osr85v">
+        <bpmn:targetRef>PeopleDatabase</bpmn:targetRef>
+      </bpmn:dataOutputAssociation>
+    </bpmn:serviceTask>
+    <bpmn:serviceTask id="DataValidator" name="Validar dados" camunda:delegateExpression="#{validatePeople}">
+      <bpmn:incoming>SequenceFlow_1ws9qe1</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_15l0rws</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="SequenceFlow_1ym0n9h" sourceRef="StartEvent_1" targetRef="FindByDocument" />
+    <bpmn:sequenceFlow id="SequenceFlow_0gwzhbg" sourceRef="SavePeople" targetRef="EndEvent_0l5wf0k" />
+    <bpmn:sequenceFlow id="SequenceFlow_15l0rws" sourceRef="DataValidator" targetRef="SavePeople" />
+    <bpmn:exclusiveGateway id="ExclusiveGateway_0qybngf" camunda:asyncBefore="true" default="SequenceFlow_1n5ya3l">
+      <bpmn:incoming>SequenceFlow_1ae02k9</bpmn:incoming>
+      <bpmn:outgoing>SequenceFlow_1ws9qe1</bpmn:outgoing>
+      <bpmn:outgoing>SequenceFlow_1n5ya3l</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="SequenceFlow_1ae02k9" sourceRef="FindByDocument" targetRef="ExclusiveGateway_0qybngf" />
+    <bpmn:sequenceFlow id="SequenceFlow_1ws9qe1" sourceRef="ExclusiveGateway_0qybngf" targetRef="DataValidator">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${peopleExists == false}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="SequenceFlow_1n5ya3l" sourceRef="ExclusiveGateway_0qybngf" targetRef="EndEvent_0l5wf0k" />
+    <bpmn:textAnnotation id="TextAnnotation_0fwhjga">
+      <bpmn:text>REST</bpmn:text>
+    </bpmn:textAnnotation>
+    <bpmn:association id="Association_158z2te" sourceRef="StartEvent_1" targetRef="TextAnnotation_0fwhjga" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_1uawxtu">
+      <bpmndi:BPMNShape id="Participant_1t3gnzw_di" bpmnElement="Participant_1t3gnzw" isHorizontal="true">
+        <dc:Bounds x="160" y="80" width="1100" height="320" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0pizsat_di" bpmnElement="SavePeople" bioc:stroke="rgb(67, 160, 71)" bioc:fill="rgb(200, 230, 201)">
+        <dc:Bounds x="1000" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndEvent_0l5wf0k_di" bpmnElement="EndEvent_0l5wf0k">
+        <dc:Bounds x="1172" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1183" y="235" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="DataStoreReference_1q7xci5_di" bpmnElement="PeopleDatabase" bioc:stroke="rgb(251, 140, 0)" bioc:fill="rgb(255, 224, 178)">
+        <dc:Bounds x="725" y="325" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="733" y="382" width="34" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1" bioc:stroke="black" bioc:fill="white">
+        <dc:Bounds x="252" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="257" y="235" width="26" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_1t24xt7_di" bpmnElement="DataOutputAssociation_1t24xt7">
+        <di:waypoint x="1000" y="234" />
+        <di:waypoint x="775" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="TextAnnotation_0fwhjga_di" bpmnElement="TextAnnotation_0fwhjga">
+        <dc:Bounds x="290" y="110" width="100" height="30" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Association_158z2te_di" bpmnElement="Association_158z2te">
+        <di:waypoint x="281" y="196" />
+        <di:waypoint x="328" y="140" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ym0n9h_di" bpmnElement="SequenceFlow_1ym0n9h">
+        <di:waypoint x="288" y="210" />
+        <di:waypoint x="380" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_0gwzhbg_di" bpmnElement="SequenceFlow_0gwzhbg">
+        <di:waypoint x="1100" y="210" />
+        <di:waypoint x="1172" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="DataOutputAssociation_1osr85v_di" bpmnElement="DataOutputAssociation_1osr85v">
+        <di:waypoint x="480" y="232" />
+        <di:waypoint x="725" y="341" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ServiceTask_0b6yt2x_di" bpmnElement="FindByDocument" bioc:stroke="rgb(67, 160, 71)" bioc:fill="rgb(200, 230, 201)">
+        <dc:Bounds x="380" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="ServiceTask_0brbct8_di" bpmnElement="DataValidator" bioc:stroke="rgb(67, 160, 71)" bioc:fill="rgb(200, 230, 201)">
+        <dc:Bounds x="660" y="170" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_15l0rws_di" bpmnElement="SequenceFlow_15l0rws">
+        <di:waypoint x="760" y="210" />
+        <di:waypoint x="1000" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="ExclusiveGateway_0qybngf_di" bpmnElement="ExclusiveGateway_0qybngf" isMarkerVisible="true">
+        <dc:Bounds x="555" y="185" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ae02k9_di" bpmnElement="SequenceFlow_1ae02k9">
+        <di:waypoint x="480" y="210" />
+        <di:waypoint x="555" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ws9qe1_di" bpmnElement="SequenceFlow_1ws9qe1">
+        <di:waypoint x="605" y="210" />
+        <di:waypoint x="660" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1n5ya3l_di" bpmnElement="SequenceFlow_1n5ya3l">
+        <di:waypoint x="580" y="185" />
+        <di:waypoint x="580" y="130" />
+        <di:waypoint x="1190" y="130" />
+        <di:waypoint x="1190" y="192" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
